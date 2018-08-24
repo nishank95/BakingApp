@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">BakingApp</string>
+    <string name="steps_label">Steps</string>
+    <string name="ingredients_label">Ingredients</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="next_step">Next step</string>
+    <string name="recipe_item_name">Recipe Name</string>
+    <string name="recipe_item_steps">Steps</string>
+    <string name="recipe_item_serves">Serves</string>
+    <string name="step_detail_number">Step 1</string>
+    <string name="step_detail_description">Here goes step description...</string>
+    <string name="widget_recipe_name">Nutella Pie</string>
+    <string name="widget_ingredients_label"><![CDATA[Ingredients >]]></string>
+    <string name="widget_ingredient_name">Ingredient Name</string>
+    <string name="widget_btn_view_recipe">view recipe</string>
+    <string name="widget_ingredient_qty">Qty</string>
+    <string name="image_poster_decription">Image poster</string>
+    <string name="step_description_goes_here">Description goes Here....</string>
+    <string name="step_no">0</string>
+</resources>
