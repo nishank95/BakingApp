@@ -35,16 +35,19 @@ public class StepDetailActivity extends AppCompatActivity {
 
         stepsModelSize = stepsModel.size();
         step_no = getIntent().getIntExtra("step_no",0);
+        if (savedInstanceState == null) {
+            // create fragment and perform fragment transaction
             stepDetailFragment = new StepsDetailFragment();
-        stepDetailFragment.setStepsModel(stepsModel,step_no);
-
+            stepDetailFragment.setStepsModel(stepsModel,step_no);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.step_detail_container, stepDetailFragment)
                     .commit();
 
+        } else {
+            // do nothing - fragment is recreated and added back automatically
+        }
 
     }
-
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

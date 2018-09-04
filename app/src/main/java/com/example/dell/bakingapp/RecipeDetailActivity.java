@@ -79,28 +79,28 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeSte
                 break;
         }
 
+        if (mRecipeModel != null) {
+            mIngredientList = mRecipeModel.getmIngredients();
+            mStepsList = mRecipeModel.getmSteps();
+        }
+
         FragmentManager fragmentManager = getSupportFragmentManager();
+
         RecipeIngredientFragment ingredientFragment = new RecipeIngredientFragment();
+        ingredientFragment.setIngredientModel(mIngredientList);
         RecipeStepsFragment stepsFragment = new RecipeStepsFragment();
+        stepsFragment.setStepsModel(mStepsList);
 
         if(savedInstanceState == null){
-            if (mRecipeModel != null) {
-                mIngredientList = mRecipeModel.getmIngredients();
-                mStepsList = mRecipeModel.getmSteps();
-
-                ingredientFragment.setIngredientModel(mIngredientList);
                 fragmentManager.beginTransaction()
                         .add(R.id.recipe_ingredient_container,ingredientFragment)
                         .commit();
 
-                stepsFragment.setStepsModel(mStepsList);
                 fragmentManager.beginTransaction()
                         .add(R.id.recipe_steps_container,stepsFragment)
                         .commit();
-            }
         }
-
-        if(savedInstanceState != null){
+        else{
             mRecipeModel = (Recipe) savedInstanceState.getSerializable("recipe_save");
             if (mRecipeModel != null ) {
                 Log.d("onSaveInstance","in the saved instance");
@@ -109,12 +109,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeSte
                     Log.d("onSaveInstance","ing ok");
                 mStepsList = mRecipeModel.getmSteps();
 
-                ingredientFragment.setIngredientModel(mIngredientList);
                 fragmentManager.beginTransaction()
                         .replace(R.id.recipe_ingredient_container,ingredientFragment)
                         .commit();
 
-                stepsFragment.setStepsModel(mStepsList);
                 fragmentManager.beginTransaction()
                         .replace(R.id.recipe_steps_container,stepsFragment)
                         .commit();

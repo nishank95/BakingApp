@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,8 @@ public class StepsDetailFragment extends Fragment {
     @BindView(R.id.step_no_label)TextView stepNo;
     @BindView(R.id.step_video_exo_player)SimpleExoPlayerView stepVideoPlayerView;
     @BindView(R.id.no_video_poster) ImageView noVideoPoster;
+    private String PLAYER_POS ="PLAYER POSITION";
+    private String PLAYER_STATE ="PLAYER STATE";
 
     private SimpleExoPlayer mExoPlayer;
 
@@ -65,8 +68,11 @@ public class StepsDetailFragment extends Fragment {
             mStep = mStepsList.get(mStepNo);
         }
 
-        if(savedInstanceState != null){
-            mStep =(Steps) savedInstanceState.getSerializable("step_save");
+       if(savedInstanceState != null){
+           if(mStepsList == null){
+               Log.d("Saved Instance","Set steps model");
+               mStep = (Steps) savedInstanceState.getSerializable("recipe_save");
+           }
         }
 
         stepDescription.setText(mStep.getmDescription());
@@ -77,20 +83,21 @@ public class StepsDetailFragment extends Fragment {
             noVideoPoster.setVisibility(View.GONE);
             stepVideoPlayerView.setVisibility(View.VISIBLE);
             initializePlayer(Uri.parse(videoUrl));
+            Log.d("Cycle","In ONCREATE VIEW");
+            if(savedInstanceState != null){
+                mExoPlayer.seekTo(savedInstanceState.getLong(PLAYER_POS));
+                mExoPlayer.setPlayWhenReady(savedInstanceState.getBoolean(PLAYER_STATE));
+            }
         }
         else {
             stepVideoPlayerView.setVisibility(View.GONE);
             noVideoPoster.setVisibility(View.VISIBLE);
             }
 
+
         return rootView;
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-    }
 
     public void setStepsModel(List<Steps> steps, int stepNo){
         mStepsList = steps;
@@ -105,15 +112,19 @@ public class StepsDetailFragment extends Fragment {
     }
 
     private void initializePlayer(Uri mediaUri){
-        TrackSelector trackSelector = new DefaultTrackSelector();
-        LoadControl loadControl = new DefaultLoadControl();
-        mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(),trackSelector,loadControl);
-        stepVideoPlayerView.setPlayer(mExoPlayer);
-        String userAgent = Util.getUserAgent(getActivity(),"Baking App");
-        MediaSource mediaSource = new ExtractorMediaSource(mediaUri,new DefaultDataSourceFactory(getActivity(),userAgent)
-                ,new DefaultExtractorsFactory(),null,null);
-        mExoPlayer.prepare(mediaSource);
-        mExoPlayer.setPlayWhenReady(true);
+        if(mExoPlayer == null){
+            TrackSelector trackSelector = new DefaultTrackSelector();
+            LoadControl loadControl = new DefaultLoadControl();
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(),trackSelector,loadControl);
+            stepVideoPlayerView.setPlayer(mExoPlayer);
+            String userAgent = Util.getUserAgent(getActivity(),"Baking App");
+            MediaSource mediaSource = new ExtractorMediaSource(mediaUri,new DefaultDataSourceFactory(getActivity(),userAgent)
+                    ,new DefaultExtractorsFactory(),null,null);
+            mExoPlayer.prepare(mediaSource);
+            mExoPlayer.setPlayWhenReady(true);
+
+        }
+
     }
 
     private void releasePlayer(){
@@ -127,14 +138,42 @@ public class StepsDetailFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("step_save",mStep);
+        outState.putSerializable("recipe_save", mStep);
+        outState.putLong(PLAYER_POS, mExoPlayer.getCurrentPosition());
+        outState.putBoolean(PLAYER_STATE, mExoPlayer.getPlayWhenReady());
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mStep != null)
-            releasePlayer();
+    public void onStart() {
+        super.onStart();
+        Log.d("Cycle","ONSTART");
+        initializePlayer(Uri.parse(mStep.getmVideoUrl()));
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("Cycle","ONRESUME");
+        initializePlayer(Uri.parse(mStep.getmVideoUrl()));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("Cycle","ONSTOP");
+        stepVideoPlayerView.setPlayer(null);
+        if(mExoPlayer != null){
+            mExoPlayer.setPlayWhenReady(false);
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("Cycle","ONDESTROY");
+        releasePlayer();
+        stepVideoPlayerView.setPlayer(null);
+    }
 }

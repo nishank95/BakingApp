@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.example.dell.bakingapp.adapter.StepListAdapter;
 import com.example.dell.bakingapp.model.Ingredients;
 import com.example.dell.bakingapp.model.Steps;
 
+import java.io.Serializable;
 import java.util.List;
 
 import butterknife.BindView;
@@ -39,6 +41,10 @@ public class RecipeIngredientFragment extends Fragment {
 
             View rootView = inflater.inflate(R.layout.fragment_recipe_ingredient,container,false);
             ButterKnife.bind(this,rootView);
+            Log.d("ERROR","In RecipeIngredientFragment");
+            if(savedInstanceState != null) {
+            mIngredientModelList = (List<Ingredients>) savedInstanceState.getSerializable("ing_save");
+            }
             IngredientListAdapter mAdapter = new IngredientListAdapter(rootView.getContext(),mIngredientModelList);
             ingredientList.setLayoutManager(new LinearLayoutManager(rootView.getContext(),LinearLayoutManager.VERTICAL,false));
             ingredientList.setAdapter(mAdapter);
@@ -46,8 +52,14 @@ public class RecipeIngredientFragment extends Fragment {
         }
 
 
-        public void setIngredientModel(List<Ingredients> ingredients){
+    public void setIngredientModel(List<Ingredients> ingredients){
             mIngredientModelList = ingredients;
         }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("ing_save", (Serializable) mIngredientModelList);
+    }
 
     }
